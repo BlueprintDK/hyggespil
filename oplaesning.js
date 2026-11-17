@@ -25,7 +25,22 @@
     if (!liste.length) return null;
     const ønsket = valg().stemme;
     if (ønsket) { const f = liste.find(s => (s.voiceURI || s.name) === ønsket); if (f) return f; }
-    return liste.find(s => /^da/i.test(s.lang)) || liste.find(s => /^(nb|no|sv)/i.test(s.lang)) || null;
+    /* Web-udgave: vælg den BEDSTE danske stemme i stedet for den første. Telefoner har ofte
+       flere: en simpel/kompakt og en forbedret/neural/online. Point efter navnet. */
+    const da = liste.filter(s => /^da/i.test(s.lang));
+    if (da.length) return da.slice().sort((a, b) => stemmePoint(b) - stemmePoint(a))[0];
+    return liste.find(s => /^(nb|no|sv)/i.test(s.lang)) || null;
+  }
+  function stemmePoint(s) {
+    const n = (s.name || '') + ' ' + (s.voiceURI || '');
+    let p = 0;
+    if (/premium/i.test(n)) p += 60;
+    if (/enhanced|forbedret|neural|natural|naturlig/i.test(n)) p += 50;
+    if (/online|google/i.test(n)) p += 30;
+    if (s.localService === false) p += 10;           // netværksstemmer lyder typisk bedre
+    if (/compact|kompakt|espeak|robot/i.test(n)) p -= 40;
+    if (/^da-DK$/i.test(s.lang)) p += 5;
+    return p;
   }
   function hassObjekt() {
     try { const el = window.parent.document.querySelector('home-assistant'); return (el && el.hass) || null; } catch (e) { return null; }
@@ -141,9 +156,9 @@
     const webview = erWebView() || typeof speechSynthesis === 'undefined';
     const antal = stemmer().length;
     const trin = android
-      ? 'Indstillinger → System → Sprog og input → Tekst-til-tale → vælg en dansk stemme (installér den, hvis den mangler).'
+      ? 'Indstillinger → søg «Tekst-til-tale» → vælg «Google Talesyntese» som maskine → tandhjulet → Installer stemmedata → Dansk → hent stemmen. Samsungs egen stemme lyder dårligere end Googles.'
       : ios
-        ? 'Indstillinger → Tilgængelighed → Oplæst indhold → Stemmer → Dansk.'
+        ? 'Indstillinger → Tilgængelighed → Oplæst indhold → Stemmer → Dansk → hent «Sara (Forbedret)» eller «Premium».'
         : 'Windows: Indstillinger → Tid og sprog → Tale. macOS: Systemindstillinger → Tilgængelighed → Oplæst indhold.';
     const overskrift = webview ? '🔊 Appen kan ikke læse op' : '🔊 Slå oplæsning til';
     const forklaring = webview
