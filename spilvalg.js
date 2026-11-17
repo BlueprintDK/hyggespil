@@ -12,6 +12,8 @@
  */
 (function () {
   if (window.HSV) return;
+  /* Web-udgave: ANDROID blev brugt herunder uden at være defineret, så indstillingsboksen gik i stå. */
+  const ANDROID = /^appassets\.androidplatform\.net$/.test(location.hostname) || /[?&]android=1/.test(location.search);
   /* index.html har LS som en global const (ikke window.LS). Brug den, ellers en lille lokal lagerhjælper. */
   const lager = (typeof window !== 'undefined' && window.LS && typeof window.LS.get === 'function') ? window.LS : {
     get(k, d) { try { const v = localStorage.getItem('hs_' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },

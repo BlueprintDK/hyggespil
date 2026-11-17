@@ -49,6 +49,7 @@
   KINDS.hangman = {
     init() { hgNew(); g.ph = 0; },
     render() {
+      if (!hg) hgNew();   // web-udgave: et genoptaget spil havde intet ord og gik i stykker
       const ord = hg.ord, synlig = [...ord].map(c => (c === ' ' || hg.gættet.has(c) ? c : '_')).join(' ');
       let o = '<style>' + HG_CSS + '</style><div class="card glass"><div class="q">🪢 Hangman</div>'
         + '<p class="hint">Kategori: ' + esc(hg.hint) + ' · ' + (6 - hg.fejl) + ' liv tilbage</p>'
