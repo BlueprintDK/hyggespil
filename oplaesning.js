@@ -15,7 +15,7 @@
   let sidst = { tekst: '', tid: 0 };
 
   /* Spil hvor oplæsning ville afsløre svaret eller ikke giver mening */
-  const IKKE = new Set(['secret', 'wheel', 'glass', 'rl', 'marb', 'shiri', 'yut', 'suit', 'lot', 'shagai', 'inuit', 'mix', 'pin', 'hard']);
+  const IKKE = new Set(['secret', 'wheel', 'glass', 'rl', 'marb', 'shiri', 'yut', 'suit', 'lot', 'shagai', 'inuit', 'mix', 'pin', 'hard', 'hangman']);
 
   function stemmer() {
     try { return (window.speechSynthesis && speechSynthesis.getVoices()) || []; } catch (e) { return []; }
@@ -76,7 +76,7 @@
 
   function tal(tekst, tvang) {
     const v = valg();
-    tekst = String(tekst || '').replace(/\s+/g, ' ').trim();
+    tekst = String(tekst || '').replace(/[\u{1F000}-\u{1FAFF}☀-➿⬀-⯿️‍]/gu, ' ').replace(/\s+/g, ' ').trim();
     if (!tekst) return;
     if (!tvang && !v.oplaes) return;
     if (!tvang && (v.haNotify || (v.haTts && v.haPlayer)) && haTal(tekst)) {
